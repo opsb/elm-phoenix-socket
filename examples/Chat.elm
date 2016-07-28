@@ -28,7 +28,7 @@ main =
 
 
 socketServer : String
-socketServer = "ws://phoenixchat.herokuapp.com/ws"
+socketServer = "wss://echo.websocket.org"
 
 
 -- MODEL
@@ -38,6 +38,7 @@ type Msg
   = SendMessage
   | SetNewMessage String
   | PhoenixMsg (Phoenix.Socket.Msg Msg)
+  | SomeOtherMessage (Phoenix.Socket.Msg Msg)
   | ReceiveChatMessage JE.Value
   | JoinChannel
   | LeaveChannel
@@ -120,8 +121,11 @@ update msg model =
           | newMessage = ""
           , phxSocket = phxSocket
           }
-        , Cmd.map PhoenixMsg phxCmd
+        , Cmd.map SomeOtherMessage phxCmd
         )
+
+    SomeOtherMessage msg ->
+      ( model, Cmd.none )
 
     SetNewMessage str ->
       ( { model | newMessage = str }
